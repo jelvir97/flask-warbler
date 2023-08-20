@@ -301,7 +301,7 @@ def messages_destroy(message_id):
 
     return redirect(f"/users/{g.user.id}")
 
-@app.route('/messages/<int:message_id>/like')
+@app.route('/messages/<int:message_id>/like', methods = ["POST"])
 def like_message(message_id):
     """handle message liking request"""
     if not g.user:

@@ -51,9 +51,15 @@
               <span class="text-muted">{{ msg.timestamp.strftime('%d %B %Y') }}</span>
               <p>{{ msg.text }}</p>
             </div>
-            <a href="/messages/{{msg.id}}/like" class="link-underline-opacity-0 {% if msg in g.user.likes %}link-warning{% else %}link-secondary{% endif %}">
-              <span>&#9733;</span>
-            </a>
+            <form method="POST" action="/messages/{{msg.id}}/like" id="messages-form">
+              <button class="
+                btn 
+                btn-sm 
+                {{'btn-primary' if msg in g.user.likes else 'btn-secondary'}}"
+              >
+                <i class="fa fa-thumbs-up"></i> 
+              </button>
+            </form>
           </li>
         {% endfor %}
       </ul>

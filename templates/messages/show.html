@@ -4,7 +4,7 @@
 
   <div class="bg"></div>
   <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-md-8">
       <ul class="list-group no-hover" id="messages">
         <li class="list-group-item">
           <a href="{{ url_for('users_show', user_id=message.user.id) }}">
@@ -13,9 +13,6 @@
           <div class="message-area">
             <div class="message-heading">
               <a href="/users/{{ message.user.id }}">@{{ message.user.username }}</a>
-              <a href="/messages/{{message.id}}/like" class="link-underline-opacity-0 {% if message in g.user.likes %}link-warning{% else %}link-secondary{% endif %}">
-                <span>&#9733;</span>
-              </a>
               {% if g.user %}
                 {% if g.user.id == message.user.id %}
                   <form method="POST"
@@ -34,6 +31,15 @@
                 {% endif %}
               {% endif %}
             </div>
+            <form method="POST" action="/messages/{{message.id}}/like" id="messages-form">
+              <button class="
+                btn 
+                btn-sm 
+                {{'btn-primary' if message in g.user.likes else 'btn-secondary'}}"
+              >
+                <i class="fa fa-thumbs-up"></i> 
+              </button>
+            </form>
             <p class="single-message">{{ message.text }}</p>
             <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
           </div>
