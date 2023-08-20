@@ -13,6 +13,9 @@
           <div class="message-area">
             <div class="message-heading">
               <a href="/users/{{ message.user.id }}">@{{ message.user.username }}</a>
+              <a href="/messages/{{message.id}}/like" class="link-underline-opacity-0 {% if message in g.user.likes %}link-warning{% else %}link-secondary{% endif %}">
+                <span>&#9733;</span>
+              </a>
               {% if g.user %}
                 {% if g.user.id == message.user.id %}
                   <form method="POST"

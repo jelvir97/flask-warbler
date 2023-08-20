@@ -309,11 +309,14 @@ def like_message(message_id):
         return redirect("/")
 
     liked_msg = Message.query.get_or_404(message_id)
+    if liked_msg in g.user.likes:
+        g.user.likes.remove(liked_msg)
+        db.session.commit()
+        return redirect('/')
+    
     g.user.likes.append(liked_msg)
     db.session.commit()
     return redirect('/')
-
-
 
 
 ##############################################################################
