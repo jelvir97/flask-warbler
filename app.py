@@ -228,9 +228,9 @@ def profile():
                 g.user = user
                 return redirect(f'/users/{g.user.id}')
             flash("Password Incorrect. Please Try Again.")
-            return render_template('/users/edit.html', form=form)
+            return render_template('/users/edit.html', form=form, user_id = g.user.id)
 
-        return render_template('/users/edit.html', form=form)
+        return render_template('/users/edit.html', form=form, user_id = g.user.id)
 
 
     flash('You must be logged in to update your profile!', 'danger')

@@ -12,6 +12,7 @@
           {% for error in field.errors %}
             <span class="text-danger">{{ error }}</span>
           {% endfor %}
+          {{field.label}}
           {{ field(placeholder=field.label.text, class="form-control") }}
         {% endfor %}
 
@@ -27,7 +28,7 @@
 
         <div class="edit-btn-area">
           <button class="btn btn-success">Edit this user!</button>
-          <a href="/users/{{ user_id }}" class="btn btn-outline-secondary">Cancel</a>
+          <a href="/users/{{user_id}}" class="btn btn-outline-secondary">Cancel</a>
         </div>
       </form>
     </div>
