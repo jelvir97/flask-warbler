@@ -68,4 +68,30 @@ class UserModelTestCase(TestCase):
 
         self.assertEqual(u.__repr__(),f'<User #{u.id}: testuser, test@test.com>')
 
-    
+    def test_is_following(self):
+        u1 = User(
+            email="test@test.com",
+            username="testuser",
+            password="HASHED_PASSWORD"
+        )
+
+        u2 = User(
+            email="test2@test.com",
+            username="testuser2",
+            password="HASHED_PASSWORD"
+        )
+        db.session.add(u1)
+        db.session.add(u2)
+        db.session.commit()
+
+        u1.following.append(u2)
+        db.session.commit()
+        self.assertTrue(u1.is_following(u2))
+        self.assertTrue(u2.is_followed_by(u1))
+
+        u1.following.remove(u2)
+        db.session.commit()
+        self.assertFalse(u1.is_following(u2))
+        self.assertFalse(u2.is_followed_by(u1))
+
+        db.session.rollback()
