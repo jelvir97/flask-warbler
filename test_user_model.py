@@ -115,3 +115,27 @@ class UserModelTestCase(TestCase):
             db.session.add(u2)
             db.session.commit()
         
+    def test_user_authentication(self):
+        u = User.signup(
+            email="besttest@test.com",
+            username="besttestuser",
+            password="HASHED_PASSWORD",
+            image_url=None
+        )       
+        db.session.commit()
+
+        self.assertIsInstance(User.authenticate(username='besttestuser',
+                                                password='HASHED_PASSWORD'),
+                              User)
+        
+        # testing w/ invalid username
+        self.assertNotIsInstance(User.authenticate(
+            username='wrongtestuser',
+            password='HASHED_PASSWORD'
+        ), User)
+
+        # testing w/ invalid password
+        self.assertNotIsInstance(User.authenticate(
+            username='besttestuser',
+            password='wrong_password'
+        ), User)
