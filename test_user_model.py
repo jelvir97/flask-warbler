@@ -9,6 +9,7 @@ import os
 from unittest import TestCase
 
 from models import db, User, Message, Follows
+from sqlalchemy.exc import IntegrityError
 
 # BEFORE we import our app, let's set an environmental variable
 # to use a different database for tests (we need to do this
@@ -34,7 +35,7 @@ class UserModelTestCase(TestCase):
 
     def setUp(self):
         """Create test client, add sample data."""
-
+        db.session.rollback()
         User.query.delete()
         Message.query.delete()
         Follows.query.delete()
@@ -68,7 +69,7 @@ class UserModelTestCase(TestCase):
 
         self.assertEqual(u.__repr__(),f'<User #{u.id}: testuser, test@test.com>')
 
-    def test_is_following(self):
+    def test_user_follow(self):
         u1 = User(
             email="test@test.com",
             username="testuser",
@@ -94,4 +95,23 @@ class UserModelTestCase(TestCase):
         self.assertFalse(u1.is_following(u2))
         self.assertFalse(u2.is_followed_by(u1))
 
-        db.session.rollback()
+
+    def test_user_creation(self):
+        u1 = User(
+            email="test@test.com",
+            username="testuser",
+            password="HASHED_PASSWORD"
+        )
+
+        self.assertIsInstance(u1, User)
+
+        
+        # self.assertNotIsInstance(u2, User)
+        with self.assertRaises(IntegrityError):
+            u2 = User(
+            email="test2@test.com",
+            username="testuser2"
+            )
+            db.session.add(u2)
+            db.session.commit()
+        
