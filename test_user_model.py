@@ -56,3 +56,16 @@ class UserModelTestCase(TestCase):
         # User should have no messages & no followers
         self.assertEqual(len(u.messages), 0)
         self.assertEqual(len(u.followers), 0)
+
+    def test_user_repr(self):
+        u = User(
+            email="test@test.com",
+            username="testuser",
+            password="HASHED_PASSWORD"
+        )
+        db.session.add(u)
+        db.session.commit()
+
+        self.assertEqual(u.__repr__(),f'<User #{u.id}: testuser, test@test.com>')
+
+    
