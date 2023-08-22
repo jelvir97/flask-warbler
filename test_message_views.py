@@ -9,6 +9,7 @@ import os
 from unittest import TestCase
 
 from models import db, connect_db, Message, User
+from sqlalchemy.exc import NoResultFound
 
 # BEFORE we import our app, let's set an environmental variable
 # to use a different database for tests (we need to do this
@@ -71,3 +72,21 @@ class MessageViewTestCase(TestCase):
 
             msg = Message.query.one()
             self.assertEqual(msg.text, "Hello")
+
+    def test_add_message_logout(self):
+        """Can use add message if logged out"""
+
+        with self.client as c:
+
+            # Now, that session setting is saved, so we can have
+            # the rest of ours test
+
+            resp = c.post("/messages/new", data={"text": "Hello"}, follow_redirects=True)
+
+            # Make sure it redirects
+            self.assertEqual(resp.status_code, 200)
+            with self.assertRaises(NoResultFound):
+                msg = Message.query.one()
+
+            self.assertIn("Sign up",resp.text) 
+            
