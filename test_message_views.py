@@ -144,6 +144,7 @@ class MessageViewTestCase(TestCase):
             self.assertEqual(resp.status_code, 200)
 
     def test_deleting_other_user_message(self):
+        """Can a user delete someone else's message"""
         with self.client as c:
             other_user = User.signup(username='other_user',
                           email='other@other.com',
