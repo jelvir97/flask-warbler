@@ -109,3 +109,19 @@ class MessageViewTestCase(TestCase):
             self.assertEqual(resp.status_code,302)
             self.assertEqual(len(self.testuser1.following),0)
             self.assertEqual(len(self.testuser2.followers),0)
+
+    def test_user_delete(self):
+        """Test user deletion from db"""
+        with self.client as c:
+
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.testuser1.id
+            
+            resp = c.post('/users/delete',follow_redirects=True)
+
+            self.assertEqual(resp.status_code,200)
+
+            users = User.query.all()
+            self.assertEqual(len(users),1)
+            self.assertIn('Sign up',resp.text)
+            self.assertEqual(users[0].username,"testuser2")
