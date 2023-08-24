@@ -89,4 +89,23 @@ class MessageViewTestCase(TestCase):
             # Make sure it redirects
             self.assertEqual(resp.status_code, 200)
             self.assertIn("Username already taken",resp.text)
+
+    def test_user_follow(self):
+        """Test user follow/unfollow"""
+        with self.client as c:
+
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY]= self.testuser1.id 
+            # test follow
+            resp = c.post(f'/users/follow/{self.testuser2.id}')
+
+            self.assertEqual(resp.status_code,302)
+            self.assertEqual(len(self.testuser1.following),1)
+            self.assertEqual(len(self.testuser2.followers),1)
             
+            #  test unfollow
+            resp = c.post(f'/users/stop-following/{self.testuser2.id}')
+
+            self.assertEqual(resp.status_code,302)
+            self.assertEqual(len(self.testuser1.following),0)
+            self.assertEqual(len(self.testuser2.followers),0)
