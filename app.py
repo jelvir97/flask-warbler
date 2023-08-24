@@ -315,6 +315,9 @@ def messages_destroy(message_id):
         return redirect("/")
 
     msg = Message.query.get(message_id)
+    if msg.user.id is not g.user.id:
+        flash('You can only delete your own messages.', 'danger')
+        return redirect('/')
     db.session.delete(msg)
     db.session.commit()
 

@@ -139,6 +139,25 @@ class MessageViewTestCase(TestCase):
 
             with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.testuser.id
-                resp = c.post("/messages/new", data={"text": "Hello","user_id":f"{other_user.id}"}, follow_redirects=True)
+            resp = c.post("/messages/new", data={"text": "Hello","user_id":f"{other_user.id}"}, follow_redirects=True)
 
-                self.assertEqual(resp.status_code, 200)
+            self.assertEqual(resp.status_code, 200)
+
+    def test_deleting_other_user_message(self):
+        with self.client as c:
+            other_user = User.signup(username='other_user',
+                          email='other@other.com',
+                          password="otherother",
+                          image_url=None)
+            db.session.commit()
+            msg = Message(text="other_user")
+            other_user.messages.append(msg)
+            db.session.commit()
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.testuser.id
+
+            resp = c.post(f"/messages/{msg.id}/delete")
+
+            self.assertEqual(resp.status_code, 302)
+            self.assertEqual(len(other_user.messages),1)
+                
