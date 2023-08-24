@@ -288,11 +288,12 @@ def messages_add():
     form = MessageForm()
 
     if form.validate_on_submit():
-        msg = Message(text=form.text.data)
-        g.user.messages.append(msg)
-        db.session.commit()
+        if g.user.id == session[CURR_USER_KEY]:
+            msg = Message(text=form.text.data)
+            g.user.messages.append(msg)
+            db.session.commit()
 
-        return redirect(f"/users/{g.user.id}")
+            return redirect(f"/users/{g.user.id}")
 
     return render_template('messages/new.html', form=form)
 

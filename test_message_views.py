@@ -109,4 +109,36 @@ class MessageViewTestCase(TestCase):
                 Message.query.one()
 
             self.assertEqual(len(self.testuser.messages),0)
-            
+
+    def test_delete_message_logout(self):
+        """Can user delete message when logged out?"""
+
+        with self.client as c:
+            # Message made and committed to db
+            # No user in session
+            msg = Message(text="test",user_id=self.testuser.id)
+            db.session.add(msg)
+            db.session.commit()
+
+            resp = c.post(f"/messages/{msg.id}/delete", follow_redirects=True)
+
+            self.assertEqual(resp.status_code, 200)
+
+            self.assertIn("Sign up",resp.text)
+
+    def test_adding_nonuser_message(self):    
+        """Can user delete add a message with a different user as other user?
+        Not sure if this is a useful test as there isn't a way that another user could do that?"""
+        with self.client as c:
+
+            other_user = User.signup(username='other_user',
+                          email='other@other.com',
+                          password="otherother",
+                          image_url=None)
+            db.session.commit()
+
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.testuser.id
+                resp = c.post("/messages/new", data={"text": "Hello","user_id":f"{other_user.id}"}, follow_redirects=True)
+
+                self.assertEqual(resp.status_code, 200)
