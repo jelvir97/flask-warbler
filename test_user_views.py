@@ -125,3 +125,21 @@ class MessageViewTestCase(TestCase):
             self.assertEqual(len(users),1)
             self.assertIn('Sign up',resp.text)
             self.assertEqual(users[0].username,"testuser2")
+
+    def test_user_follower_page(self):
+        """Test if user can view follower/following page"""
+        with self.client as c:
+
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.testuser1.id
+
+            # following page
+            resp1 = c.get(f'/users/{self.testuser2.id}/following')
+            self.assertEqual(resp1.status_code,200)
+            self.assertIn(self.testuser2.username,resp1.text)
+
+            # followers page
+
+            resp2 = c.get(f'/users/{self.testuser2.id}/followers')
+            self.assertEqual(resp2.status_code,200)
+            self.assertIn(self.testuser2.username,resp2.text)
