@@ -162,6 +162,7 @@ class MessageViewTestCase(TestCase):
             self.assertEqual(len(other_user.messages),1)
 
     def test_message_like(self):
+        """Can user like and unlike message?"""
         with self.client as c:
 
             with c.session_transaction() as sess:
@@ -170,9 +171,28 @@ class MessageViewTestCase(TestCase):
             self.testuser.messages.append(msg)
             db.session.commit()
 
+            # user likes message
             resp = c.post(f'/messages/{msg.id}/like')
 
             self.assertEqual(resp.status_code, 302)
             self.assertEqual(len(self.testuser.likes),1)
+
+            # user unlikes message
+            resp = c.post(f'/messages/{msg.id}/like')
+
+            self.assertEqual(resp.status_code, 302)
+            self.assertEqual(len(self.testuser.likes),0)
     
-                
+    def test_message_like_logout(self):
+        """Can message be like when user is logged out?"""
+        with self.client as c:
+
+            msg = Message(text="test")
+            self.testuser.messages.append(msg)
+            db.session.commit()
+
+            resp = c.post(f'/messages/{msg.id}/like',follow_redirects=True)
+
+            self.assertEqual(resp.status_code,200)
+            self.assertEqual(len(self.testuser.likes),0)
+            self.assertIn("Sign up",resp.text)           
