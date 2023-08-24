@@ -143,3 +143,16 @@ class MessageViewTestCase(TestCase):
             resp2 = c.get(f'/users/{self.testuser2.id}/followers')
             self.assertEqual(resp2.status_code,200)
             self.assertIn(self.testuser2.username,resp2.text)
+
+    def test_user_follower_page_logout(self):
+        """Test following/follower pages if logged out"""
+        with self.client as c:
+
+            # following page
+            resp1 = c.get(f'/users/{self.testuser2.id}/following')
+            self.assertEqual(resp1.status_code,302)
+
+            # followers page
+
+            resp2 = c.get(f'/users/{self.testuser2.id}/followers')
+            self.assertEqual(resp2.status_code,302)
