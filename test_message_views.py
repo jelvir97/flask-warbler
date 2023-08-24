@@ -160,4 +160,19 @@ class MessageViewTestCase(TestCase):
 
             self.assertEqual(resp.status_code, 302)
             self.assertEqual(len(other_user.messages),1)
+
+    def test_message_like(self):
+        with self.client as c:
+
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.testuser.id
+            msg = Message(text="test")
+            self.testuser.messages.append(msg)
+            db.session.commit()
+
+            resp = c.post(f'/messages/{msg.id}/like')
+
+            self.assertEqual(resp.status_code, 302)
+            self.assertEqual(len(self.testuser.likes),1)
+    
                 
