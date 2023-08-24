@@ -9,7 +9,8 @@ import os
 from unittest import TestCase
 
 from models import db, connect_db, Message, User
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound,IntegrityError
+from psycopg2.errors import UniqueViolation
 
 # BEFORE we import our app, let's set an environmental variable
 # to use a different database for tests (we need to do this
@@ -39,7 +40,7 @@ class MessageViewTestCase(TestCase):
 
     def setUp(self):
         """Create test client, add sample data."""
-
+        db.session.rollback()
         User.query.delete()
         Message.query.delete()
 
@@ -73,3 +74,19 @@ class MessageViewTestCase(TestCase):
             users = User.query.all()
             self.assertEqual(len(users),3)
             self.assertEqual(users[2].username,"testuser3")
+
+    def test_user_signup_duplicate(self):
+        """Test user sign up if username is taken"""
+
+        with self.client as c:
+            
+            resp = c.post("/signup", data={"username": "testuser2",
+                                           "password":"testuser3",
+                                           "email":"test3@test.com",
+                                           "image_url":None},
+                                           follow_redirects=True)
+
+            # Make sure it redirects
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("Username already taken",resp.text)
+            
